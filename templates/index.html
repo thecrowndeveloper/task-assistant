@@ -1,0 +1,57 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Prioritization Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Task Prioritization Assistant</h1>
+
+        <!-- Task Creation Form -->
+        <form action="{{ url_for('add_task') }}" method="POST" class="task-form">
+            <input type="text" name="title" placeholder="What needs to get done?" required>
+            
+            <select name="priority">
+                <option value="High">High Priority</option>
+                <option value="Medium" selected>Medium Priority</option>
+                <option value="Low">Low Priority</option>
+            </select>
+
+            <input type="date" name="due_date">
+            <button type="submit" class="btn-primary">Add Task</button>
+        </form>
+
+        <!-- Task List -->
+        <div class="task-list">
+            {% for task in tasks %}
+            <div class="task-card {% if task['is_completed'] %}completed{% endif %}">
+                <div class="task-info">
+                    <span class="badge badge-{{ task['priority'] | lower }}">{{ task['priority'] }}</span>
+                    <span class="task-title">{{ task['title'] }}</span>
+                    {% if task['due_date'] %}
+                    <span class="task-date"> {{ task['due_date'] }}</span>
+                    {% endif %}
+                </div>
+                
+                <div class="task-actions">
+                    {% if not task['is_completed'] %}
+                    <form action="{{ url_for('complete_task', id=task['id']) }}" method="POST">
+                        <button type="submit" class="btn-action check">Done</button>
+                    </form>
+                    {% endif %}
+                    <form action="{{ url_for('delete_task', id=task['id']) }}" method="POST">
+                        <button type="submit" class="btn-action delete">Delete</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <p class="empty-state">No tasks yet. Add one above to see prioritization in action!</p>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
